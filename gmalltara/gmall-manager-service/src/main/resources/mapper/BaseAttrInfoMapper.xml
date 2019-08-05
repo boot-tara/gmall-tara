@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.gmall.manager.mapper.BaseAttrInfoMapper">
+    <select id="getAttrList" resultType="BaseAttrInfo">
+        select * from base_attr_info;
+    </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+      insert into base_attr_info (attr_name,catalog3_id) VALUES (#{attrName},#{catalog3Id});
+  </insert>
+
+
+  <select id="getAttrInfoById" resultMap="div">
+     SELECT bai.`attr_name`,bai.`catalog3_id`,bai.`id`,bav.`id` AS "bd",bav.`value_name` FROM base_attr_info bai LEFT JOIN
+     base_attr_value  bav ON bai.`id`=bav.`attr_id`  WHERE bai.`id`=#{id}
+  </select>
+
+  <resultMap id="div" type="BaseAttrInfo" autoMapping="true">
+      <result property="id" column="id"></result>
+      <collection property="attrValueList" ofType="BaseAttrValue" autoMapping="true">
+          <result property="id" column="bd"></result>
+      </collection>
+  </resultMap>
+
+    <select id="getAttrListByCtg3Id" resultMap="div">
+        SELECT bai.`id`,bai.`attr_name`,bai.`catalog3_id`,bav.`id` AS "bd" ,bav.`value_name` FROM base_attr_info  bai
+        LEFT JOIN base_attr_value  bav ON bai.`id`=bav.`attr_id` WHERE  catalog3_id=#{catalog3Id}
+    </select>
+
+</mapper>

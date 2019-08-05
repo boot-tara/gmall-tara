@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.gmall.manager.mapper.SpuSaleAttrValueMapper">
+
+    <insert id="insert" >
+
+        insert into spu_sale_attr_value(spu_id,sale_attr_id,sale_attr_value_name) VALUES
+        <foreach collection="spuSaleAttrValueList" item="spuSaleAttrValue" index="index" separator=",">
+            (#{spuSaleAttrValue.spuId},#{spuSaleAttrValue.saleAttrId},#{spuSaleAttrValue.saleAttrValueName})
+        </foreach>
+    </insert>
+
+
+    <select id="getSkuSaleAttrValueListBySpu" resultMap="div">
+
+        SELECT si.id,si.spu_id,ssav.id AS ssavId,ssav.sale_attr_id,ssav.sale_attr_value_id FROM sku_info si INNER JOIN sku_sale_attr_value  ssav
+        ON  si.id=ssav.sku_id WHERE spu_id=1
+    </select>
+
+    <resultMap id="div" type="SkuInfo" autoMapping="true">
+        <result column="id" property="id"></result>
+        <collection property="skuSaleAttrValueList"  ofType="SkuSaleAttrValue" autoMapping="true">
+            <result column="ssavId"  property="id"></result>
+        </collection>
+    </resultMap>
+
+    <select id="getSpuSaleAttrListCheckBySku" parameterType="Map" resultMap="selectSpuSaleAttrListCheckBySkuMap">
+        select ssa.id as ssaId , ssav.id as ssavId ,
+        ssa.sale_attr_id,ssa.sale_attr_name,ssav.id ,ssav.sale_attr_value_name , ssav2.sku_id,
+        if(ssav2.sku_id is not null,1,0) as isChecked
+        from spu_sale_attr ssa inner JOIN spu_sale_attr_value ssav
+        on ssa.sale_attr_id = ssav.sale_attr_id
+        and ssa.spu_id = ssav.spu_id
+        and ssa.spu_id = #{spuId}
+        LEFT JOIN sku_sale_attr_value ssav2
+        on ssav2.sale_attr_id = ssa.sale_attr_id
+        and ssav2.sale_attr_value_id = ssav.id
+        and ssav2.sku_id = #{skuId}
+    </select>
+
+    <resultMap id="selectSpuSaleAttrListCheckBySkuMap" type="com.atguigu.gmall.bean.SpuSaleAttr" autoMapping="true">
+        <result property="id" column="ssaId"></result>
+        <collection property="spuSaleAttrValueList" ofType="com.atguigu.gmall.bean.SpuSaleAttrValue" autoMapping="true">
+            <result column="ssavId" property="id"></result>
+        </collection>
+    </resultMap>
+</mapper>

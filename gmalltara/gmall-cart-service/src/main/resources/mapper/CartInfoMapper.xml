@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.gmall.cart.mapper.CartInfoMapper">
+
+    <select id="selectCartInfo" parameterType="Map" resultType="CartInfo">
+        select * from cart_info where user_id=#{userId} and sku_id=#{skuId}
+    </select>
+
+    <update id="updateCart" >
+        update  cart_info ci
+        <trim prefix="set" suffixOverrides=",">
+            <if test="skuNum!=null">
+                ci.sku_num=#{skuNum},
+            </if>
+            <if test="cartPrice!=null">
+                ci.cart_price=#{cartPrice},
+            </if>
+        </trim>
+        where sku_id=#{skuId}
+    </update>
+
+    <insert id="insert">
+        insert into cart_info (user_id,sku_id,cart_price,is_checked,sku_price,sku_num,sku_name)
+        VALUES (#{userId},#{skuId},#{cartPrice},#{isChecked},#{skuPrice},#{skuNum},#{skuName})
+    </insert>
+
+    <select id="selectByUserId" resultType="cartInfo">
+      SELECT * FROM cart_info WHERE user_id=#{userId}
+    </select>
+
+    <update id="update" >
+        update cart_info ci
+        <trim prefix="set" suffixOverrides=",">
+            <if test="skuId!=null">
+                 sku_id=#{skuId},
+            </if>
+            <if test="isChecked!=null">
+                is_checked=#{isChecked},
+            </if>
+        </trim>
+        where user_id=#{userId}
+    </update>
+
+
+    <delete id="deleteByBatch">
+        delete from cart_info where id in
+        <foreach collection="cartInfos" item="cartInfo" open="(" close=")" separator=",">
+            #{cartInfo.id}
+        </foreach>
+    </delete>
+</mapper>

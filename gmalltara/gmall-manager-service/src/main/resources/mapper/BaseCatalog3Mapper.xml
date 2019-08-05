@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.gmall.manager.mapper.BaseCatalog3Mapper">
+   <select id="getBaseCatalog3" resultType="BaseCatalog3">
+
+       select * from base_catalog3 where catalog2_id=#{catalog2Id}
+   </select>
+</mapper>

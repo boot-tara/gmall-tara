@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div id="dlg" class="easyui-dialog" title="编辑属性" style="width:400px;height:200px;"
+     closed="true" data-options="iconCls:'icon-save',resizable:true,modal:true,buttons:'#bb'" >
+    <label>属性名称</label>
+    <input  id="attrName" name="attrName" class="easyui-textbox" data-options="" style="width:100px"/>
+    <br/>
+    <table id="dg_av" class="easyui-datagrid" title="属性值列表"></table>
+</div>
+
+
+<div id="bb">
+    <a href="#" id="save" class="easyui-linkbutton" onclick="saveAttr()">保存</a>
+    <a href="#" class="easyui-linkbutton">关闭</a>
+</div>
+
+<script>
+    function initAttrValueDatagrid(attrInfo){
+       var d= $("#dg_av").datagrid({
+            columns:[[
+                {field:'id',title:'编号',width:100},
+                {field:'valueName',title:'属性值名称',width:400,
+                    editor:{
+                        type: 'validatebox', options: { required: true}
+                    }
+                }
+            ]],
+
+            //是的编辑器可用
+            onDblClickRow:function(rowIndex,rowData){
+              //
+              d.datagrid("beginEdit",rowIndex);
+
+              //失去焦点，退出编辑
+                var valueName = rowData.valueName;
+                $("input.datagrid-editable-input").val(valueName).bind("blur",function(evt){
+                    d.datagrid('endEdit',rowIndex);
+                });
+            },
+
+            toolbar: [{
+                iconCls: 'icon-add',
+                text:"添加",
+                handler: function(){
+                    $("#dg_av").datagrid("appendRow",{
+                        id:"",valueName:""
+                    })}
+            },'-',{
+                iconCls: 'icon-remove',
+                text:"删除",
+                handler: function(){
+                    // 获得选中的行对象
+                    var dg_av = $("#dg_av").datagrid("getSelected");
+                    // 获得行号
+                    var rowNum = $("#dg_av").datagrid("getRowIndex",dg_av);
+                    // 根据行号删除
+                    $("#dg_av").datagrid("deleteRow",rowNum);
+                }
+            }]
+
+
+        })
+        if(attrInfo){
+           //编辑
+            $.ajax({
+                url:"getAttrInfoById/"+attrInfo.id,
+                type:"get",
+                success:function(data){
+                    console.log(data);
+                }
+            })
+        }
+    }
+    //保存属性
+    function saveAttr(){
+        var catalog3Id=$("#ctg3ForAttrList").combobox("getValue");
+        var attrName = $("#attrName").textbox("getText");
+
+        var attrInfo={};
+        attrInfo["catalog3Id"]=catalog3Id;
+        attrInfo["attrName"]=attrName;
+
+        //封装属性值
+        var rows=$("#dg_av").datagrid("getRows");
+        console.log(rows);  //getRows[{},{}]        getData  {total: 2, rows: Array(2)}
+        $.each(rows,function(index,item){
+            console.log(item);//{}
+            attrInfo["attrValueList["+index+"].valueName"]=item.valueName;
+        })
+
+        //保存
+        $.ajax({
+            url:"saveAttr",
+            data:attrInfo,
+            success:function(data){
+
+            }
+        })
+    }
+</script>
+</body>
+</html>

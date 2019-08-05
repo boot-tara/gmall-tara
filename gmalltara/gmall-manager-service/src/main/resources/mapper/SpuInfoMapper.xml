@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.gmall.manager.mapper.SpuInfoMapper">
+
+    <select id="selectAll" resultType="SpuInfo">
+        select * from spu_info where catalog3_id =#{catalog3Id}
+    </select>
+
+    <insert id="saveSpu" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into spu_info (spu_name,description,catalog3_id) VALUES (#{spuName},#{description},#{catalog3Id})
+    </insert>
+</mapper>

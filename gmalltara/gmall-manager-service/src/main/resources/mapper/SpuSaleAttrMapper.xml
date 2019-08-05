@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.gmall.manager.mapper.SpuSaleAttrMapper">
+
+    <insert id="insert" >
+
+        insert into spu_sale_attr(spu_id,sale_attr_id,sale_attr_name) VALUES
+        <foreach collection="spuSaleAttrList" item="spuSaleAttr" index="index" separator=",">
+            (#{spuSaleAttr.spuId},#{spuSaleAttr.saleAttrId},#{spuSaleAttr.saleAttrName})
+        </foreach>
+    </insert>
+
+
+    <select id="getSaleAttrListBySpuId" resultMap="div">
+       SELECT  ssa.id,ssa.spu_id,ssa.sale_attr_name,ssav.id AS sid,ssav.sale_attr_id,ssav.sale_attr_value_name FROM spu_sale_attr ssa INNER JOIN spu_sale_attr_value ssav ON
+       ssa.sale_attr_id=ssav.sale_attr_id  AND ssa.spu_id=ssav.spu_id WHERE ssa.spu_id=#{spuId}
+    </select>
+
+    <resultMap id="div" type="spuSaleAttr" autoMapping="true">
+        <result column="id" property="id"></result>
+        <collection property="spuSaleAttrValueList" ofType="spuSaleAttrValue" autoMapping="true">
+            <result column="sid" property="id"></result>
+        </collection>
+    </resultMap>
+
+
+    <select id="getSpuSaleAttrListCheckBySku" parameterType="Map" resultMap="div2">
+         SELECT ssa.id AS ssaId , ssav.id AS ssavId ,
+        ssa.sale_attr_id,ssa.sale_attr_name,ssav.id ,ssav.sale_attr_value_name , ssav2.sku_id,
+        IF(ssav2.sku_id IS NOT NULL,1,0) AS isChecked
+        FROM spu_sale_attr ssa INNER JOIN spu_sale_attr_value ssav
+        ON ssa.sale_attr_id = ssav.sale_attr_id
+        AND ssa.spu_id = ssav.spu_id
+        AND ssa.spu_id = #{spuId}
+        LEFT JOIN sku_sale_attr_value ssav2
+        ON ssav2.sale_attr_id = ssa.sale_attr_id
+        AND ssav2.sale_attr_value_id = ssav.id
+        AND ssav2.sku_id = #{skuId}
+    </select>
+
+    <resultMap id="div2" type="SpuSaleAttr" autoMapping="true">
+        <result property="id" column="ssaId"></result>
+        <collection property="spuSaleAttrValueList" ofType="SpuSaleAttrValue">
+            <result column="ssavId"  property="id"></result>
+        </collection>
+    </resultMap>
+</mapper>
